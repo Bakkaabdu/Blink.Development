@@ -8,7 +8,8 @@ public enum StatusStep
 }
 public class Status
 {
-    public StatusStep statusStep { get; set; }
-    public required ICollection<Order> orders { get; set; }
+    public Guid Id { get; set; }
+    public StatusStep StatusStep { get; set; }
+    public required ICollection<Order> Orders { get; set; }
 }
 
