@@ -1,5 +1,4 @@
-﻿using Blink.Development.Api.Configuration;
-using Blink.Development.Entities.Dtos;
+﻿using Blink.Development.Entities.Dtos;
 using Blink.Development.Entities.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,12 +14,18 @@ namespace Blink.Development.Api.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly JwtConfig _jwtConfig;
+        private readonly IConfiguration _configuration;
+        //private readonly JwtConfig _jwtConfig;
 
-        public AuthenticationController(UserManager<IdentityUser> userManager, JwtConfig jwtConfig)
+        public AuthenticationController(
+            UserManager<IdentityUser> userManager,
+            IConfiguration configuration
+        //JwtConfig jwtConfig
+        )
         {
             _userManager = userManager;
-            _jwtConfig = jwtConfig;
+            //_jwtConfig = jwtConfig;
+            _configuration = configuration;
         }
 
         [HttpPost]
@@ -74,11 +79,58 @@ namespace Blink.Development.Api.Controllers
             return BadRequest(ModelState);
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserLoginRequestDto loginDto)
+        {
+            if (ModelState.IsValid)
+            {
+                var existing_user = await _userManager.FindByEmailAsync(loginDto.Email);
+                if (existing_user == null)
+                {
+                    return BadRequest(new AuthResult()
+                    {
+                        Errors = new List<string>() {
+                            "Invalid login request"
+                        },
+                        Result = false
+                    });
+                }
+                var is_valid = await _userManager.CheckPasswordAsync(existing_user, loginDto.Password);
+                if (is_valid)
+                {
+                    var jwtToken = GenerateJwtToken(existing_user);
+                    return Ok(new AuthResult()
+                    {
+                        Result = true,
+                        Token = jwtToken
+                    });
+                }
+                else
+                {
+                    return BadRequest(new AuthResult()
+                    {
+                        Errors = new List<string>() {
+                            "Invalid login request"
+                        },
+                        Result = false
+                    });
+                }
+            }
+            return BadRequest(new AuthResult()
+            {
+                Errors = new List<string>()
+                {
+                    "Invalid payload"
+                },
+                Result = false
+            });
+        }
+
         private string GenerateJwtToken(IdentityUser user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
 
-            var key = Encoding.UTF8.GetBytes(_jwtConfig.Secret);
+            var key = Encoding.UTF8.GetBytes(_configuration.GetSection("JwtConfig:Secret").Value);
 
             // Token descriptor
             var tokenDescriptor = new SecurityTokenDescriptor

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
 namespace Blink.Development.Api
 {
     public class Program
@@ -22,6 +21,8 @@ namespace Blink.Development.Api
             options.UseSqlServer(connectionString));
 
             builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+            //builder.Services.AddSingleton(sp =>
+            //    sp.GetRequiredService<IOptions<JwtConfig>>().Value); 
 
             builder.Services.AddAuthentication(opt =>
             {
@@ -30,33 +31,40 @@ namespace Blink.Development.Api
                 opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
-                var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JwtConfig:Secret").Value);
+                var secret = builder.Configuration.GetSection("JwtConfig:Secret").Value;
+                if (string.IsNullOrEmpty(secret))
+                {
+                    throw new InvalidOperationException("JWT Secret is not configured.");
+                }
+                var key = Encoding.ASCII.GetBytes(secret);
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = false, // change it when you deploy to production
                     ValidateAudience = false, // change it when you deploy to production
-                    ValidateLifetime = true,
+                    ValidateLifetime = true,//
                     RequireExpirationTime = false, // change it when you deploy to production needs to be updated when refresh token is implemented
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = builder.Configuration["JwtConfig:Issuer"],
-                    ValidAudience = builder.Configuration["JwtConfig:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                    ValidateIssuerSigningKey = true, //
+                    IssuerSigningKey = new SymmetricSecurityKey(key) //
                 };
             });
 
+            builder.Services.AddDefaultIdentity<IdentityUser>(opt =>
+            {
+                opt.SignIn.RequireConfirmedEmail = false;
+            }).AddEntityFrameworkStores<AppDbContext>();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
-            builder.Services.AddDefaultIdentity<IdentityUser>()
-                   .AddEntityFrameworkStores<AppDbContext>();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();
@@ -64,7 +72,6 @@ namespace Blink.Development.Api
             app.UseAuthentication();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
