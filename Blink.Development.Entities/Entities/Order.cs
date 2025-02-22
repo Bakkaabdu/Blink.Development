@@ -17,11 +17,11 @@
 
         // relationships
         public Guid StoreId { get; set; }
-        public required Store Store { get; set; } // the order has one store and the store has many orders
+        public required Store Store { get; set; } // the order has one store and the store has many orders // done
         public Guid CustomerId { get; set; }
-        public required Customer Customer { get; set; } // the order has one customer and the customer has many orders
+        public required Customer Customer { get; set; } // the order has one customer and the customer has many orders // done
         public Guid? DeliveryId { get; set; }
-        public Delivery? Delivery { get; set; } // the order has one delivery and the delivery has many orders
+        public Delivery? Delivery { get; set; } // the order has one delivery and the delivery has many orders 
         public Guid StatusId { get; set; }
         public required Status Status { get; set; } // the order has one status and the status has many orders => the status is like "Pending", "Delivered", "Canceled", etc. => the status is an enum => the status is a lookup table => the status is a reference table => the status is a master table
         public Guid CityId { get; set; }
@@ -30,7 +30,7 @@
         public Street? Street { get; set; } = null!;// the order has one street and the street has many orders
         public Guid? BranchId { get; set; }
         public Branch? Branch { get; set; }
-        //public Guid MissionId { get; set; }
-        //public Mission Mission { get; set; } // the order has one mission and the mission has many orders
+        public Guid TrashId { get; set; }
+        public Trash? Trash { get; set; }
     }
 }

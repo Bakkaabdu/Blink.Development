@@ -8,7 +8,7 @@
 
         public Guid BranchId { get; set; }
         public required Branch Branch { get; set; }
-        public ICollection<Order>? Orders { get; set; }
+        public ICollection<Order>? Orders { get; set; } // done 
         public ICollection<Inventory>? Inventory { get; set; }
         public Guid? MoneyTransactionId { get; set; }
         public MoneyTransaction? MoneyTransaction { get; set; }
