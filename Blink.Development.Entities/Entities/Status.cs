@@ -11,5 +11,6 @@ public class Status
     public Guid Id { get; set; }
     public StatusStep StatusStep { get; set; }
     public required ICollection<Order> Orders { get; set; }
+    public bool IsDeleted { get; set; }
 }
 
