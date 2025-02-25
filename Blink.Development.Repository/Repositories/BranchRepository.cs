@@ -14,12 +14,8 @@ public class BranchRepository : GenericRepository<Branch>, IBranchRepository
     {
         try
         {
-            return await _dbSet
-                .Where(x => x.IsDeleted == false)
-                .AsNoTracking()
-                .AsSplitQuery()
-                .OrderBy(x => x.CreatedAt)
-                .ToListAsync();
+            return await _dbSet.Where(x => x.IsDeleted == false).ToListAsync();
+
         }
         catch (Exception ex)
         {
@@ -56,7 +52,6 @@ public class BranchRepository : GenericRepository<Branch>, IBranchRepository
                 return false;
 
             branchToUpdate.Name = branch.Name ?? branchToUpdate.Name;
-
 
             await _context.SaveChangesAsync();
             return true;

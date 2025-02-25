@@ -1,6 +1,8 @@
 
 using Blink.Development.Api.Configuration;
 using Blink.Development.Repository.Data;
+using Blink.Development.Repository.Repositories;
+using Blink.Development.Repository.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -49,15 +51,18 @@ namespace Blink.Development.Api
                 };
             });
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(opt =>
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>(opt =>
             {
-                opt.SignIn.RequireConfirmedEmail = false;
+                opt.SignIn.RequireConfirmedAccount = true;
             }).AddEntityFrameworkStores<AppDbContext>();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             var app = builder.Build();
 
@@ -70,7 +75,6 @@ namespace Blink.Development.Api
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
-
             app.UseAuthorization();
 
             app.MapControllers();

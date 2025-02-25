@@ -30,7 +30,7 @@
         public Street? Street { get; set; } = null!;// the order has one street and the street has many orders
         public Guid? BranchId { get; set; }
         public Branch? Branch { get; set; }
-        public Guid TrashId { get; set; }
+        public Guid? TrashId { get; set; }
         public Trash? Trash { get; set; }
     }
 }

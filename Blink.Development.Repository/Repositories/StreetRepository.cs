@@ -6,11 +6,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Blink.Development.Repository.Repositories;
 
-public class TrashRepository : GenericRepository<Trash>, ITrashRepository
+public class StreetRepository : GenericRepository<Street>, IStreetRepository
 {
-    public TrashRepository(ILogger logger, AppDbContext context) : base(logger, context) { }
+    public StreetRepository(ILogger logger, AppDbContext context) : base(logger, context) { }
 
-    public override async Task<IEnumerable<Trash>> GetAll()
+    public override async Task<IEnumerable<Street>> GetAll()
     {
         try
         {
@@ -18,12 +18,12 @@ public class TrashRepository : GenericRepository<Trash>, ITrashRepository
                 .Where(x => x.IsDeleted == false)
                 .AsNoTracking()
                 .AsSplitQuery()
-                .OrderBy(x => x.ReturnDate)
+                .OrderBy(x => x.CreatedAt)
                 .ToListAsync();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Get All Function Erorr", typeof(TrashRepository));
+            _logger.LogError(ex, $"Get All Function Erorr", typeof(StreetRepository));
             throw;
         }
     }
@@ -41,21 +41,21 @@ public class TrashRepository : GenericRepository<Trash>, ITrashRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Delete Function Erorr", typeof(TrashRepository));
+            _logger.LogError(ex, $"Delete Function Erorr", typeof(StreetRepository));
             throw;
         }
     }
 
-    public override async Task<bool> Update(Trash trash)
+    public override async Task<bool> Update(Street street)
     {
         try
         {
-            var trashToUpdate = await _dbSet
-                .FirstOrDefaultAsync(x => x.Id == trash.Id);
-            if (trashToUpdate == null)
+            var streetToUpdate = await _dbSet
+                .FirstOrDefaultAsync(x => x.Id == street.Id);
+            if (streetToUpdate == null)
                 return false;
 
-            trashToUpdate.Name = trash.Name ?? trashToUpdate.Name;
+            streetToUpdate.Name = street.Name ?? streetToUpdate.Name;
 
 
             await _context.SaveChangesAsync();
@@ -63,8 +63,10 @@ public class TrashRepository : GenericRepository<Trash>, ITrashRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating store");
+            _logger.LogError(ex, "Error updating street");
             throw;
         }
     }
+
+
 }

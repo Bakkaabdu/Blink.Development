@@ -1,6 +1,8 @@
-﻿namespace Blink.Development.Repository.Repositories.Interfaces
+﻿using Blink.Development.Entities.Entities;
+
+namespace Blink.Development.Repository.Repositories.Interfaces
 {
-    public interface IStoreRepository
+    public interface IStoreRepository : IGenericRepository<Store>
     {
     }
 }

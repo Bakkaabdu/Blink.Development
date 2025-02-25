@@ -62,6 +62,9 @@ public class DeliveryRepository : GenericRepository<Delivery>, IDeliveryReposito
             deliveryToUpdate.Description = delivery.Description ?? deliveryToUpdate.Description;
             deliveryToUpdate.IsActive = delivery.IsActive;
             deliveryToUpdate.IdentityCardPhoto = delivery.IdentityCardPhoto ?? deliveryToUpdate.IdentityCardPhoto;
+            deliveryToUpdate.BranchId = delivery.BranchId;
+            deliveryToUpdate.Balance = delivery.Balance;
+            deliveryToUpdate.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
             return true;

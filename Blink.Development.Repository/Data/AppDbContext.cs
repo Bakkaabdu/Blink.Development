@@ -7,6 +7,8 @@ namespace Blink.Development.Repository.Data;
 
 public class AppDbContext : IdentityDbContext
 {
+    public virtual DbSet<User> Users { get; set; }
+
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     // store delivery(check the last one) city order branch Trash and cutomers are done
     // DbSet properties using proper PascalCase naming

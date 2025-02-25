@@ -15,10 +15,14 @@ namespace Blink.Development.Api.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogger<AuthenticationController> _logger;
         //private readonly JwtConfig _jwtConfig;
 
         public AuthenticationController(
             UserManager<IdentityUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            ILogger<AuthenticationController> logger,
             IConfiguration configuration
         //JwtConfig jwtConfig
         )
@@ -26,10 +30,53 @@ namespace Blink.Development.Api.Controllers
             _userManager = userManager;
             //_jwtConfig = jwtConfig;
             _configuration = configuration;
+            _roleManager = roleManager;
+            _logger = logger;
         }
 
-        [HttpPost]
-        [Route("Register")]
+        [HttpGet("GetAllRoles")]
+        public IActionResult GetAllRoles()
+        {
+            var roles = _roleManager.Roles.ToList();
+            return Ok(roles);
+        }
+        [HttpPost("CreateRole")]
+        public async Task<IActionResult> CreateRole(string name)
+        {
+            var roleExist = await _roleManager.RoleExistsAsync(name);
+            if (!roleExist)
+            {
+                var roleResult = await _roleManager.CreateAsync(new IdentityRole(name));
+                if (roleResult.Succeeded)
+                {
+                    _logger.LogInformation($"Role {name} created successfully");
+                    return Ok(new
+                    {
+                        result = $"Role {name} created successfully"
+                    });
+                }
+                else
+                {
+                    _logger.LogInformation($"Role {name} has not been created");
+                    return BadRequest(new
+                    {
+                        erorr = $"Role {name} has not been created"
+                    });
+                }
+            }
+            return BadRequest(new
+            {
+                erorr = $"Role {name} already exist"
+            });
+        }
+        [HttpGet("getAllUsers")]
+        public IActionResult GetAllUsers()
+        {
+            var users = _userManager.Users.ToList();
+            return Ok(users);
+        }
+
+        [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] UserRegistrationRequestDto requestDto)
         {
             // validate incoming request
