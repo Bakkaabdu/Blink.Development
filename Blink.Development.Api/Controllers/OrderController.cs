@@ -59,6 +59,25 @@ namespace Blink.Development.Api.Controllers
 
             return NoContent();
         }
+        [HttpGet("GetOrders")]
+        public async Task<IActionResult> GetOrders()
+        {
+            var orders = await _unitOfWork.Orders.GetAll();
+            return Ok(orders);
+        }
+        [HttpDelete]
+        [Route("{orderId:guid}")]
+        public async Task<IActionResult> DeleteOrder(Guid orderId)
+        {
+            var order = await _unitOfWork.Orders.GetById(orderId);
+            if (order == null)
+            {
+                return NotFound("Order not Found");
+            }
+            await _unitOfWork.Orders.Delete(orderId);
+            await _unitOfWork.CompleteAsync();
+            return NoContent();
+        }
 
     }
 }
