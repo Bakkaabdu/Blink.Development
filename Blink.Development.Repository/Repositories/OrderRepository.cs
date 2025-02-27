@@ -67,7 +67,12 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
             orderToUpdate.CanTry = order.CanTry;
             orderToUpdate.CanPay50 = order.CanPay50;
             orderToUpdate.bigShipmentsPrice = order.bigShipmentsPrice;
-
+            orderToUpdate.CityId = order.CityId;
+            orderToUpdate.Status = order.Status;
+            orderToUpdate.StreetId = order.StreetId;
+            orderToUpdate.BranchId = order.BranchId;
+            orderToUpdate.TrashId = order.TrashId;
+            orderToUpdate.bigShipmentsPrice = order.bigShipmentsPrice;
             await _context.SaveChangesAsync();
             return true;
         }

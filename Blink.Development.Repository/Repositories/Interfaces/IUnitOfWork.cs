@@ -9,7 +9,6 @@ public interface IUnitOfWork
     IMissionRepository Missions { get; }
     IMoneyTransactionRepository MoneyTransactions { get; }
     IOrderRepository Orders { get; }
-    IStatusRepository Status { get; }
     IStreetRepository Streets { get; }
     ITrashRepository Trashes { get; }
 

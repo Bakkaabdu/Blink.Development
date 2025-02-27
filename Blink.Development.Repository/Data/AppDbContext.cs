@@ -15,7 +15,6 @@ public class AppDbContext : IdentityDbContext<User>
     public DbSet<City> Cities { get; set; }
     public DbSet<Street> Streets { get; set; }
     public DbSet<Customer> Customers { get; set; }
-    public DbSet<Status> Statuses { get; set; }
     public DbSet<User> StoresAndDeliveries { get; set; }
     public DbSet<Trash> Trashes { get; set; }
     public DbSet<MoneyTransaction> MoneyTransactions { get; set; }
@@ -46,11 +45,6 @@ public class AppDbContext : IdentityDbContext<User>
             .HasForeignKey(o => o.DeliveryUserId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Order>()
-            .HasOne(o => o.Status)
-            .WithMany(s => s.Orders)
-            .HasForeignKey(o => o.StatusId)
-            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Order>()
             .HasOne(o => o.City)
@@ -178,6 +172,11 @@ public class AppDbContext : IdentityDbContext<User>
             .WithOne(s => s.DeliveryMoneyTransaction)
             .HasForeignKey<MoneyTransaction>(s => s.DeliveryUserId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.Balance)
+            .HasColumnType("decimal(18,2)");
+
 
     }
 

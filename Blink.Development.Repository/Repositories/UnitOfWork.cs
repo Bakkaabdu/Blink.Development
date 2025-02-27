@@ -22,8 +22,6 @@ public class UnitOfWork : IUnitOfWork, IDisposable
 
     public IOrderRepository Orders { get; }
 
-    public IStatusRepository Status => throw new NotImplementedException();
-
     public IStreetRepository Streets { get; }
 
     public ITrashRepository Trashes { get; }

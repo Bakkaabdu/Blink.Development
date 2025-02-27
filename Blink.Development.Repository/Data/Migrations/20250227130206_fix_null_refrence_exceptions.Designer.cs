@@ -4,6 +4,7 @@ using Blink.Development.Repository.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Blink.Development.Repository.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250227130206_fix_null_refrence_exceptions")]
+    partial class fix_null_refrence_exceptions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -233,8 +236,8 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.Property<Guid>("RandomOrderGuid")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<Guid>("StatusId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("StreetId")
                         .HasColumnType("uniqueidentifier");
@@ -246,6 +249,7 @@ namespace Blink.Development.Repository.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserStoreId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("bigShipmentsPrice")
@@ -261,11 +265,30 @@ namespace Blink.Development.Repository.Data.Migrations
 
                     b.HasIndex("DeliveryUserId");
 
+                    b.HasIndex("StatusId");
+
                     b.HasIndex("StreetId");
 
                     b.HasIndex("UserStoreId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Blink.Development.Entities.Entities.Status", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("StatusStep")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Statuses");
                 });
 
             modelBuilder.Entity("Blink.Development.Entities.Entities.Street", b =>
@@ -670,6 +693,12 @@ namespace Blink.Development.Repository.Data.Migrations
                         .HasForeignKey("DeliveryUserId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Blink.Development.Entities.Entities.Status", "Status")
+                        .WithMany("Orders")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Blink.Development.Entities.Entities.Street", "Street")
                         .WithMany("Orders")
                         .HasForeignKey("StreetId")
@@ -678,7 +707,8 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.HasOne("Blink.Development.Entities.Entities.User", "UserStore")
                         .WithMany("StoreOrders")
                         .HasForeignKey("UserStoreId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Branch");
 
@@ -687,6 +717,8 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("DeliveryUser");
+
+                    b.Navigation("Status");
 
                     b.Navigation("Street");
 
@@ -818,6 +850,11 @@ namespace Blink.Development.Repository.Data.Migrations
             modelBuilder.Entity("Blink.Development.Entities.Entities.Order", b =>
                 {
                     b.Navigation("Trash");
+                });
+
+            modelBuilder.Entity("Blink.Development.Entities.Entities.Status", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Blink.Development.Entities.Entities.Street", b =>

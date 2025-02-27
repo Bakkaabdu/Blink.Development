@@ -1,5 +1,6 @@
 ﻿using Blink.Development.Authentication.Models.DTOs.Incoming;
 using Blink.Development.Authentication.Models.DTOs.OutGoing;
+using Blink.Development.Entities;
 using Blink.Development.Entities.Dtos;
 using Blink.Development.Entities.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -63,7 +64,17 @@ namespace Blink.Development.Api.Controllers
                     Email = requestDto.Email,
                     UserName = requestDto.Email,
                     PhoneNumber = requestDto.PhoneNumber,
-                    Name = requestDto.Name
+                    Name = requestDto.Name,
+                    TypeOfUser = (Blink.Development.Entities.Entities.UserType)requestDto.UserType,
+                    StoreAddress = requestDto.StoreAddress,
+                    StorePhoneNumber = requestDto.StorePhoneNumber,
+                    StoreBranchId = requestDto.StoreBranchId,
+                    DeliveryAddress = requestDto.DeliveryAddress,
+                    DeliveryPhoneNumber = requestDto.DeliveryPhoneNumber,
+                    DeliveryBranchId = requestDto.DeliveryBranchId,
+                    Balance = 0,
+                    Inventory = new List<Inventory>(),
+                    Mission = new List<Mission>(),
                 };
 
                 // create user
