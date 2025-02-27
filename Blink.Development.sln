@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blink.Development.Entities"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blink.Development.Repository", "Blink.Development.Repository\Blink.Development.Repository.csproj", "{57B24C60-8C02-4365-8EF1-D7913E84FD33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blink.Development.Authentication", "Blink.Development.Authentication\Blink.Development.Authentication.csproj", "{20C497CE-1B6D-4C39-8CAE-F2FBE4134E80}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{57B24C60-8C02-4365-8EF1-D7913E84FD33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57B24C60-8C02-4365-8EF1-D7913E84FD33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57B24C60-8C02-4365-8EF1-D7913E84FD33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20C497CE-1B6D-4C39-8CAE-F2FBE4134E80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20C497CE-1B6D-4C39-8CAE-F2FBE4134E80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20C497CE-1B6D-4C39-8CAE-F2FBE4134E80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20C497CE-1B6D-4C39-8CAE-F2FBE4134E80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

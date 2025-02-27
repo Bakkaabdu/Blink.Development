@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Blink.Development.Authentication\Blink.Development.Authentication.csproj" />
     <ProjectReference Include="..\Blink.Development.Repository\Blink.Development.Repository.csproj" />
   </ItemGroup>
 

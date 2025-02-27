@@ -4,6 +4,7 @@ using Blink.Development.Repository.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Blink.Development.Repository.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250226231525_adding properties in the user class")]
+    partial class addingpropertiesintheuserclass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,6 +105,55 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("Blink.Development.Entities.Entities.Delivery", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("BranchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("MoneyTransactionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Deliveries");
+                });
+
             modelBuilder.Entity("Blink.Development.Entities.Entities.Inventory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -125,16 +177,15 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.Property<decimal>("Quantity")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid>("StoreId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserStoreId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserStoreId");
+                    b.HasIndex("StoreId");
 
                     b.ToTable("Inventory");
                 });
@@ -148,27 +199,27 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("DeliveryUserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid?>("DeliveryId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<Guid?>("StoreId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserStoreId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("DeliveryUserId")
+                    b.HasIndex("DeliveryId")
                         .IsUnique()
-                        .HasFilter("[DeliveryUserId] IS NOT NULL");
+                        .HasFilter("[DeliveryId] IS NOT NULL");
 
-                    b.HasIndex("UserStoreId")
+                    b.HasIndex("StoreId")
                         .IsUnique()
-                        .HasFilter("[UserStoreId] IS NOT NULL");
+                        .HasFilter("[StoreId] IS NOT NULL");
 
                     b.ToTable("MoneyTransactions");
                 });
@@ -200,8 +251,8 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("DeliveryUserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid?>("DeliveryId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -236,6 +287,9 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.Property<Guid>("StatusId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("StoreId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("StreetId")
                         .HasColumnType("uniqueidentifier");
 
@@ -244,10 +298,6 @@ namespace Blink.Development.Repository.Data.Migrations
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("UserStoreId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("bigShipmentsPrice")
                         .HasColumnType("bit");
@@ -260,13 +310,13 @@ namespace Blink.Development.Repository.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("DeliveryUserId");
+                    b.HasIndex("DeliveryId");
 
                     b.HasIndex("StatusId");
 
-                    b.HasIndex("StreetId");
+                    b.HasIndex("StoreId");
 
-                    b.HasIndex("UserStoreId");
+                    b.HasIndex("StreetId");
 
                     b.ToTable("Orders");
                 });
@@ -286,6 +336,55 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Statuses");
+                });
+
+            modelBuilder.Entity("Blink.Development.Entities.Entities.Store", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("BranchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("MissionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("MoneyTransactionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Stores");
                 });
 
             modelBuilder.Entity("Blink.Development.Entities.Entities.Street", b =>
@@ -364,23 +463,8 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DeliveryAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("DeliveryBranchId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("DeliveryMoneyTransactionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("DeliveryPhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -390,18 +474,19 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("MissionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -423,18 +508,6 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StoreAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("StoreBranchId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("StoreMoneyTransactionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("StorePhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -444,8 +517,6 @@ namespace Blink.Development.Repository.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DeliveryBranchId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -453,8 +524,6 @@ namespace Blink.Development.Repository.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("StoreBranchId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -487,19 +556,18 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.Property<DateTime>("RequestDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("StoreId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("TakeItBy")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserStoreId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserStoreId");
+                    b.HasIndex("StoreId");
 
                     b.ToTable("Missions");
                 });
@@ -637,33 +705,52 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Blink.Development.Entities.Entities.Inventory", b =>
+            modelBuilder.Entity("Blink.Development.Entities.Entities.Delivery", b =>
                 {
-                    b.HasOne("Blink.Development.Entities.Entities.User", "UserStore")
-                        .WithMany("Inventory")
-                        .HasForeignKey("UserStoreId")
+                    b.HasOne("Blink.Development.Entities.Entities.Branch", "Branch")
+                        .WithMany("Deliveries")
+                        .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("UserStore");
+                    b.HasOne("Blink.Development.Entities.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Blink.Development.Entities.Entities.Inventory", b =>
+                {
+                    b.HasOne("Blink.Development.Entities.Entities.Store", "Store")
+                        .WithMany("Inventory")
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("Blink.Development.Entities.Entities.MoneyTransaction", b =>
                 {
-                    b.HasOne("Blink.Development.Entities.Entities.User", "DeliveryUser")
-                        .WithOne("DeliveryMoneyTransaction")
-                        .HasForeignKey("Blink.Development.Entities.Entities.MoneyTransaction", "DeliveryUserId")
+                    b.HasOne("Blink.Development.Entities.Entities.Delivery", "Delivery")
+                        .WithOne("MoneyTransaction")
+                        .HasForeignKey("Blink.Development.Entities.Entities.MoneyTransaction", "DeliveryId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .HasConstraintName("FK_Delivery_MoneyTransaction");
 
-                    b.HasOne("Blink.Development.Entities.Entities.User", "UserStore")
-                        .WithOne("StoreMoneyTransaction")
-                        .HasForeignKey("Blink.Development.Entities.Entities.MoneyTransaction", "UserStoreId")
+                    b.HasOne("Blink.Development.Entities.Entities.Store", "Store")
+                        .WithOne("MoneyTransaction")
+                        .HasForeignKey("Blink.Development.Entities.Entities.MoneyTransaction", "StoreId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.Navigation("DeliveryUser");
+                    b.Navigation("Delivery");
 
-                    b.Navigation("UserStore");
+                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("Blink.Development.Entities.Entities.Order", b =>
@@ -685,9 +772,9 @@ namespace Blink.Development.Repository.Data.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Blink.Development.Entities.Entities.User", "DeliveryUser")
-                        .WithMany("DeliveryOrders")
-                        .HasForeignKey("DeliveryUserId")
+                    b.HasOne("Blink.Development.Entities.Entities.Delivery", "Delivery")
+                        .WithMany("Orders")
+                        .HasForeignKey("DeliveryId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Blink.Development.Entities.Entities.Status", "Status")
@@ -696,16 +783,16 @@ namespace Blink.Development.Repository.Data.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("Blink.Development.Entities.Entities.Store", "Store")
+                        .WithMany("Orders")
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Blink.Development.Entities.Entities.Street", "Street")
                         .WithMany("Orders")
                         .HasForeignKey("StreetId")
                         .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Blink.Development.Entities.Entities.User", "UserStore")
-                        .WithMany("StoreOrders")
-                        .HasForeignKey("UserStoreId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
 
                     b.Navigation("Branch");
 
@@ -713,13 +800,32 @@ namespace Blink.Development.Repository.Data.Migrations
 
                     b.Navigation("Customer");
 
-                    b.Navigation("DeliveryUser");
+                    b.Navigation("Delivery");
 
                     b.Navigation("Status");
 
-                    b.Navigation("Street");
+                    b.Navigation("Store");
 
-                    b.Navigation("UserStore");
+                    b.Navigation("Street");
+                });
+
+            modelBuilder.Entity("Blink.Development.Entities.Entities.Store", b =>
+                {
+                    b.HasOne("Blink.Development.Entities.Entities.Branch", "Branch")
+                        .WithMany("Stores")
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Blink.Development.Entities.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Blink.Development.Entities.Entities.Street", b =>
@@ -744,32 +850,15 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Blink.Development.Entities.Entities.User", b =>
-                {
-                    b.HasOne("Blink.Development.Entities.Entities.Branch", "DeliveryBranch")
-                        .WithMany("DeliveryUsers")
-                        .HasForeignKey("DeliveryBranchId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Blink.Development.Entities.Entities.Branch", "StoreBranch")
-                        .WithMany("UserStores")
-                        .HasForeignKey("StoreBranchId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("DeliveryBranch");
-
-                    b.Navigation("StoreBranch");
-                });
-
             modelBuilder.Entity("Blink.Development.Entities.Mission", b =>
                 {
-                    b.HasOne("Blink.Development.Entities.Entities.User", "UserStore")
+                    b.HasOne("Blink.Development.Entities.Entities.Store", "Store")
                         .WithMany("Mission")
-                        .HasForeignKey("UserStoreId")
+                        .HasForeignKey("StoreId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("UserStore");
+                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -825,11 +914,11 @@ namespace Blink.Development.Repository.Data.Migrations
 
             modelBuilder.Entity("Blink.Development.Entities.Entities.Branch", b =>
                 {
-                    b.Navigation("DeliveryUsers");
+                    b.Navigation("Deliveries");
 
                     b.Navigation("Orders");
 
-                    b.Navigation("UserStores");
+                    b.Navigation("Stores");
                 });
 
             modelBuilder.Entity("Blink.Development.Entities.Entities.City", b =>
@@ -844,6 +933,13 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.Navigation("Orders");
                 });
 
+            modelBuilder.Entity("Blink.Development.Entities.Entities.Delivery", b =>
+                {
+                    b.Navigation("MoneyTransaction");
+
+                    b.Navigation("Orders");
+                });
+
             modelBuilder.Entity("Blink.Development.Entities.Entities.Order", b =>
                 {
                     b.Navigation("Trash");
@@ -854,24 +950,20 @@ namespace Blink.Development.Repository.Data.Migrations
                     b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("Blink.Development.Entities.Entities.Street", b =>
+            modelBuilder.Entity("Blink.Development.Entities.Entities.Store", b =>
                 {
-                    b.Navigation("Orders");
-                });
-
-            modelBuilder.Entity("Blink.Development.Entities.Entities.User", b =>
-                {
-                    b.Navigation("DeliveryMoneyTransaction");
-
-                    b.Navigation("DeliveryOrders");
-
                     b.Navigation("Inventory");
 
                     b.Navigation("Mission");
 
-                    b.Navigation("StoreMoneyTransaction");
+                    b.Navigation("MoneyTransaction");
 
-                    b.Navigation("StoreOrders");
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("Blink.Development.Entities.Entities.Street", b =>
+                {
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

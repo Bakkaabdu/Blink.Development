@@ -14,8 +14,6 @@ public class UnitOfWork : IUnitOfWork, IDisposable
 
     public ICustomerRepository Customers { get; }
 
-    public IDeliveryRepository Deliveries { get; }
-
     public IInventoryRepository Inventories { get; }
 
     public IMissionRepository Missions { get; }
@@ -25,8 +23,6 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     public IOrderRepository Orders { get; }
 
     public IStatusRepository Status => throw new NotImplementedException();
-
-    public IStoreRepository Stores { get; }
 
     public IStreetRepository Streets { get; }
 
@@ -39,13 +35,11 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         Branchs = new BranchRepository(logger, _context);
         Cities = new CityRepository(logger, _context);
         Customers = new CustomerRepository(logger, _context);
-        Deliveries = new DeliveryRepository(logger, _context);
         Inventories = new InventoryRepository(logger, _context);
         Missions = new MissionRepository(logger, _context);
         MoneyTransactions = new MoneyTransactionRepository(logger, _context);
         Orders = new OrderRepository(logger, _context);
         // Status
-        Stores = new StoreRepository(logger, _context);
         Streets = new StreetRepository(logger, _context);
         Trashes = new TrashRepository(logger, _context);
     }

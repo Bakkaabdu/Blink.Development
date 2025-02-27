@@ -1,4 +1,6 @@
-﻿using Blink.Development.Entities.Dtos;
+﻿using Blink.Development.Authentication.Models.DTOs.Incoming;
+using Blink.Development.Authentication.Models.DTOs.OutGoing;
+using Blink.Development.Entities.Dtos;
 using Blink.Development.Entities.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,17 +15,17 @@ namespace Blink.Development.Api.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<AuthenticationController> _logger;
         //private readonly JwtConfig _jwtConfig;
 
         public AuthenticationController(
-            UserManager<IdentityUser> userManager,
-            RoleManager<IdentityRole> roleManager,
+            UserManager<User> userManager,
+            IConfiguration configuration,
             ILogger<AuthenticationController> logger,
-            IConfiguration configuration
+            RoleManager<IdentityRole> roleManager
         //JwtConfig jwtConfig
         )
         {
@@ -34,47 +36,8 @@ namespace Blink.Development.Api.Controllers
             _logger = logger;
         }
 
-        [HttpGet("GetAllRoles")]
-        public IActionResult GetAllRoles()
-        {
-            var roles = _roleManager.Roles.ToList();
-            return Ok(roles);
-        }
-        [HttpPost("CreateRole")]
-        public async Task<IActionResult> CreateRole(string name)
-        {
-            var roleExist = await _roleManager.RoleExistsAsync(name);
-            if (!roleExist)
-            {
-                var roleResult = await _roleManager.CreateAsync(new IdentityRole(name));
-                if (roleResult.Succeeded)
-                {
-                    _logger.LogInformation($"Role {name} created successfully");
-                    return Ok(new
-                    {
-                        result = $"Role {name} created successfully"
-                    });
-                }
-                else
-                {
-                    _logger.LogInformation($"Role {name} has not been created");
-                    return BadRequest(new
-                    {
-                        erorr = $"Role {name} has not been created"
-                    });
-                }
-            }
-            return BadRequest(new
-            {
-                erorr = $"Role {name} already exist"
-            });
-        }
-        [HttpGet("getAllUsers")]
-        public IActionResult GetAllUsers()
-        {
-            var users = _userManager.Users.ToList();
-            return Ok(users);
-        }
+
+
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] UserRegistrationRequestDto requestDto)
@@ -91,26 +54,31 @@ namespace Blink.Development.Api.Controllers
                         Errors = new List<string>() {
                             "Email already exist"
                         },
-                        Result = false
+                        Success = false
                     });
                 }
 
-                var new_user = new IdentityUser()
+                var new_user = new User()
                 {
                     Email = requestDto.Email,
-                    UserName = requestDto.Email
+                    UserName = requestDto.Email,
+                    PhoneNumber = requestDto.PhoneNumber,
+                    Name = requestDto.Name
                 };
+
                 // create user
                 var is_created = await _userManager.CreateAsync(new_user, requestDto.Password);
                 if (is_created.Succeeded)
                 {
+                    await _userManager.AddToRoleAsync(new_user, "User");
                     // generate jwt token
                     var token = GenerateJwtToken(new_user);
 
                     return Ok(new AuthResult()
                     {
-                        Result = true,
-                        Token = token
+                        Success = true,
+                        Token = token,
+
                     });
                 }
                 else
@@ -118,12 +86,19 @@ namespace Blink.Development.Api.Controllers
                     return BadRequest(new AuthResult()
                     {
                         Errors = is_created.Errors.Select(x => x.Description).ToList(),
-                        Result = false
+                        Success = false
                     });
                 }
             }
 
             return BadRequest(ModelState);
+        }
+
+        [HttpGet("getAllUsers")]
+        public IActionResult GetAllUsers()
+        {
+            var users = _userManager.Users.ToList();
+            return Ok(users);
         }
 
         [HttpPost("login")]
@@ -139,7 +114,7 @@ namespace Blink.Development.Api.Controllers
                         Errors = new List<string>() {
                             "Invalid login request"
                         },
-                        Result = false
+                        Success = false
                     });
                 }
                 var is_valid = await _userManager.CheckPasswordAsync(existing_user, loginDto.Password);
@@ -148,7 +123,7 @@ namespace Blink.Development.Api.Controllers
                     var jwtToken = GenerateJwtToken(existing_user);
                     return Ok(new AuthResult()
                     {
-                        Result = true,
+                        Success = true,
                         Token = jwtToken
                     });
                 }
@@ -159,7 +134,7 @@ namespace Blink.Development.Api.Controllers
                         Errors = new List<string>() {
                             "Invalid login request"
                         },
-                        Result = false
+                        Success = false
                     });
                 }
             }
@@ -169,27 +144,22 @@ namespace Blink.Development.Api.Controllers
                 {
                     "Invalid payload"
                 },
-                Result = false
+                Success = false
             });
         }
 
-        private string GenerateJwtToken(IdentityUser user)
+        private string GenerateJwtToken(User user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
+
+            var claims = AddAllValidClaims(user).Result;
 
             var key = Encoding.UTF8.GetBytes(_configuration.GetSection("JwtConfig:Secret").Value);
 
             // Token descriptor
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim("Id", user.Id),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString())
-                }),
+                Subject = new ClaimsIdentity(claims),
 
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
@@ -199,6 +169,38 @@ namespace Blink.Development.Api.Controllers
             var jwtToken = jwtTokenHandler.WriteToken(token);
 
             return jwtToken;
+        }
+
+        private async Task<List<Claim>> AddAllValidClaims(User user)
+        {
+            var claims = new List<Claim>
+            {
+                    new Claim("Id", user.Id),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString())
+            };
+            var roles = await _userManager.GetClaimsAsync(user);
+            claims.AddRange(roles);
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            foreach (var userRole in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, userRole));
+                var role = await _roleManager.FindByNameAsync(userRole);
+                if (role == null)
+                {
+                    var roleClaims = await _roleManager.GetClaimsAsync(role);
+                    foreach (var roleClaim in roleClaims)
+                    {
+                        claims.Add(roleClaim);
+                    }
+                }
+
+            }
+            return claims;
         }
     }
 }

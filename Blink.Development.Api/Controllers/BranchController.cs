@@ -3,10 +3,13 @@ using Blink.Development.Entities.Dtos.Request.Branch;
 using Blink.Development.Entities.Dtos.Response.Branch;
 using Blink.Development.Entities.Entities;
 using Blink.Development.Repository.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blink.Development.Api.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
     public class BranchController : CommonController
     {
 

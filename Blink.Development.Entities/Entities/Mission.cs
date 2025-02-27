@@ -4,20 +4,20 @@ namespace Blink.Development.Entities
 {
     public enum TakeItBy
     {
-        ComingToBlink,
-        WithDelivery
+        ComingToBlink = 1,
+        WithDelivery = 2
     }
     public enum ReturnType
     {
-        Collection,
-        Settlement,
-        Return_Delivery
+        Collection = 1,
+        Settlement = 2,
+        Return_Delivery = 3
     }
 
     public class Mission : BaseEntity
     {
-        public Guid StoreId { get; set; }
-        public required Store Store { get; set; }
+        public string UserStoreId { get; set; }
+        public required User UserStore { get; set; }
         public ReturnType? IsTrashed { get; set; } // enum
         public required TakeItBy TakeItBy { get; set; } // enum
 

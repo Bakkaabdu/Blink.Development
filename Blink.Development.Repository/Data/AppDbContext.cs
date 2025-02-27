@@ -5,9 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Blink.Development.Repository.Data;
 
-public class AppDbContext : IdentityDbContext
+public class AppDbContext : IdentityDbContext<User>
 {
-    public virtual DbSet<User> Users { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     // store delivery(check the last one) city order branch Trash and cutomers are done
@@ -17,8 +16,7 @@ public class AppDbContext : IdentityDbContext
     public DbSet<Street> Streets { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Status> Statuses { get; set; }
-    public DbSet<Store> Stores { get; set; }
-    public DbSet<Delivery> Deliveries { get; set; }
+    public DbSet<User> StoresAndDeliveries { get; set; }
     public DbSet<Trash> Trashes { get; set; }
     public DbSet<MoneyTransaction> MoneyTransactions { get; set; }
     public DbSet<Mission> Missions { get; set; }
@@ -31,9 +29,9 @@ public class AppDbContext : IdentityDbContext
 
 
         modelBuilder.Entity<Order>()
-            .HasOne(o => o.Store)
-            .WithMany(s => s.Orders)
-            .HasForeignKey(o => o.StoreId)
+            .HasOne(o => o.UserStore)
+            .WithMany(s => s.StoreOrders)
+            .HasForeignKey(o => o.UserStoreId)
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Order>()
@@ -43,9 +41,9 @@ public class AppDbContext : IdentityDbContext
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Order>()
-            .HasOne(o => o.Delivery)
-            .WithMany(d => d.Orders)
-            .HasForeignKey(o => o.DeliveryId)
+            .HasOne(o => o.DeliveryUser)
+            .WithMany(d => d.DeliveryOrders)
+            .HasForeignKey(o => o.DeliveryUserId)
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Order>()
@@ -77,59 +75,60 @@ public class AppDbContext : IdentityDbContext
             .HasForeignKey<Trash>(o => o.OrderId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Store>()
-            .HasOne(s => s.Branch)
-            .WithMany(b => b.Stores)
-            .HasForeignKey(s => s.BranchId)
+        // user store
+        modelBuilder.Entity<User>()
+            .HasOne(s => s.StoreBranch)
+            .WithMany(b => b.UserStores)
+            .HasForeignKey(s => s.StoreBranchId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Store>()
-            .HasOne(s => s.MoneyTransaction)
-            .WithOne(mt => mt.Store)
-            .HasForeignKey<MoneyTransaction>(mt => mt.StoreId)
+        modelBuilder.Entity<User>()
+            .HasOne(s => s.StoreMoneyTransaction)
+            .WithOne(mt => mt.UserStore)
+            .HasForeignKey<MoneyTransaction>(mt => mt.UserStoreId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Store>()
-            .HasMany(s => s.Orders)
-            .WithOne(o => o.Store)
-            .HasForeignKey(o => o.StoreId)
+        modelBuilder.Entity<User>()
+            .HasMany(s => s.StoreOrders)
+            .WithOne(o => o.UserStore)
+            .HasForeignKey(o => o.UserStoreId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Store>()
+        modelBuilder.Entity<User>()
             .HasMany(s => s.Inventory)
-            .WithOne(i => i.Store)
-            .HasForeignKey(i => i.StoreId)
+            .WithOne(i => i.UserStore)
+            .HasForeignKey(i => i.UserStoreId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Store>()
+        modelBuilder.Entity<User>()
             .HasMany(s => s.Mission)
-            .WithOne(m => m.Store)
-            .HasForeignKey(m => m.StoreId)
+            .WithOne(m => m.UserStore)
+            .HasForeignKey(m => m.UserStoreId)
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Inventory>()
-            .HasOne(i => i.Store)
+            .HasOne(i => i.UserStore)
             .WithMany(s => s.Inventory)
-            .HasForeignKey(i => i.StoreId)
+            .HasForeignKey(i => i.UserStoreId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Delivery>()
-            .HasOne(Delivery => Delivery.Branch)
-            .WithMany(Branch => Branch.Deliveries)
-            .HasForeignKey(Delivery => Delivery.BranchId)
+        modelBuilder.Entity<User>()
+            .HasOne(Delivery => Delivery.DeliveryBranch)
+            .WithMany(Branch => Branch.DeliveryUsers)
+            .HasForeignKey(Delivery => Delivery.DeliveryBranchId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Delivery>()
-            .HasOne(m => m.MoneyTransaction)
-            .WithOne(d => d.Delivery)
+        modelBuilder.Entity<User>()
+            .HasOne(m => m.DeliveryMoneyTransaction)
+            .WithOne(d => d.DeliveryUser)
             .HasConstraintName("FK_Delivery_MoneyTransaction")
-            .HasForeignKey<MoneyTransaction>(d => d.DeliveryId)
+            .HasForeignKey<MoneyTransaction>(d => d.DeliveryUserId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Delivery>()
-            .HasMany(Delivery => Delivery.Orders)
-            .WithOne(Order => Order.Delivery)
-            .HasForeignKey(Order => Order.DeliveryId)
+        modelBuilder.Entity<User>()
+            .HasMany(Delivery => Delivery.DeliveryOrders)
+            .WithOne(Order => Order.DeliveryUser)
+            .HasForeignKey(Order => Order.DeliveryUserId)
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<City>()
@@ -145,15 +144,15 @@ public class AppDbContext : IdentityDbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Branch>()
-            .HasMany(b => b.Stores)
-            .WithOne(s => s.Branch)
-            .HasForeignKey(s => s.BranchId)
+            .HasMany(b => b.UserStores)
+            .WithOne(s => s.StoreBranch)
+            .HasForeignKey(s => s.StoreBranchId)
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Branch>()
-            .HasMany(b => b.Deliveries)
-            .WithOne(s => s.Branch)
-            .HasForeignKey(s => s.BranchId)
+            .HasMany(b => b.DeliveryUsers)
+            .WithOne(s => s.DeliveryBranch)
+            .HasForeignKey(s => s.DeliveryBranchId)
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Branch>()
@@ -169,15 +168,15 @@ public class AppDbContext : IdentityDbContext
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<MoneyTransaction>()
-            .HasOne(mt => mt.Store)
-            .WithOne(s => s.MoneyTransaction)
-            .HasForeignKey<MoneyTransaction>(mt => mt.StoreId)
+            .HasOne(mt => mt.UserStore)
+            .WithOne(s => s.StoreMoneyTransaction)
+            .HasForeignKey<MoneyTransaction>(mt => mt.UserStoreId)
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<MoneyTransaction>()
-            .HasOne(mt => mt.Delivery)
-            .WithOne(s => s.MoneyTransaction)
-            .HasForeignKey<MoneyTransaction>(s => s.DeliveryId)
+            .HasOne(mt => mt.DeliveryUser)
+            .WithOne(s => s.DeliveryMoneyTransaction)
+            .HasForeignKey<MoneyTransaction>(s => s.DeliveryUserId)
             .OnDelete(DeleteBehavior.NoAction);
 
     }
