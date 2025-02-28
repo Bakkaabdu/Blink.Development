@@ -1,5 +1,7 @@
-﻿using Blink.Development.Repository.Data;
+﻿using Blink.Development.Entities.Entities;
+using Blink.Development.Repository.Data;
 using Blink.Development.Repository.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace Blink.Development.Repository.Repositories;
@@ -25,8 +27,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     public IStreetRepository Streets { get; }
 
     public ITrashRepository Trashes { get; }
-
-    public UnitOfWork(AppDbContext context, ILoggerFactory loggerFactory)
+    public UnitOfWork(AppDbContext context, ILoggerFactory loggerFactory, UserManager<User> userManager)
     {
         _context = context;
         var logger = loggerFactory.CreateLogger("log");
@@ -35,12 +36,12 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         Customers = new CustomerRepository(logger, _context);
         Inventories = new InventoryRepository(logger, _context);
         Missions = new MissionRepository(logger, _context);
-        MoneyTransactions = new MoneyTransactionRepository(logger, _context);
+        MoneyTransactions = new MoneyTransactionRepository(logger, _context, userManager);
         Orders = new OrderRepository(logger, _context);
-        // Status
         Streets = new StreetRepository(logger, _context);
         Trashes = new TrashRepository(logger, _context);
     }
+
     public async Task<bool> CompleteAsync()
     {
         var result = await _context.SaveChangesAsync();
@@ -51,4 +52,5 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         _context.Dispose();
     }
+
 }

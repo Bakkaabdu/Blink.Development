@@ -46,27 +46,6 @@ public class MissionRepository : GenericRepository<Mission>, IMissionRepository
         }
     }
 
-    public override async Task<bool> Update(Mission mission)
-    {
-        try
-        {
-            var missionToUpdate = await _dbSet
-                .FirstOrDefaultAsync(x => x.Id == mission.Id);
-            if (missionToUpdate == null)
-                return false;
-
-            missionToUpdate.Name = mission.Name ?? missionToUpdate.Name;
-
-
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating Mission");
-            throw;
-        }
-    }
 
 
 }

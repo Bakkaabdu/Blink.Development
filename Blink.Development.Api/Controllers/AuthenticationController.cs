@@ -72,7 +72,7 @@ namespace Blink.Development.Api.Controllers
                     DeliveryAddress = requestDto.DeliveryAddress,
                     DeliveryPhoneNumber = requestDto.DeliveryPhoneNumber,
                     DeliveryBranchId = requestDto.DeliveryBranchId,
-                    Balance = 0,
+                    Balance = requestDto.Balance,
                     Inventory = new List<Inventory>(),
                     Mission = new List<Mission>(),
                 };

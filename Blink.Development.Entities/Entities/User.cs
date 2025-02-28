@@ -18,6 +18,7 @@ namespace Blink.Development.Entities.Entities
         public Branch? StoreBranch { get; set; } = null;
         public ICollection<Inventory>? Inventory { get; set; }
         public Guid? StoreMoneyTransactionId { get; set; }
+        //public decimal? StoreBalance { get; set; }
         public MoneyTransaction? StoreMoneyTransaction { get; set; }
         public ICollection<Mission>? Mission { get; set; }
 

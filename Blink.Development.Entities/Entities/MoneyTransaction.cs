@@ -9,7 +9,6 @@
         public User? UserStore { get; set; }
         public decimal Amount { get; set; }
         public DateTime TransactionDate { get; set; }
-
         public bool IsDeleted { get; set; }
     }
 }

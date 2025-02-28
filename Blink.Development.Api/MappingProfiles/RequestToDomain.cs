@@ -1,8 +1,14 @@
 ﻿using AutoMapper;
+using Blink.Development.Entities;
 using Blink.Development.Entities.Dtos.Request.Branch;
 using Blink.Development.Entities.Dtos.Request.City;
 using Blink.Development.Entities.Dtos.Request.Customer;
+using Blink.Development.Entities.Dtos.Request.Inventory;
+using Blink.Development.Entities.Dtos.Request.Mission;
+using Blink.Development.Entities.Dtos.Request.MoneyTransaction;
 using Blink.Development.Entities.Dtos.Request.Order;
+using Blink.Development.Entities.Dtos.Request.Street;
+using Blink.Development.Entities.Dtos.Request.Trash;
 using Blink.Development.Entities.Entities;
 
 namespace Blink.Development.Api.MappingProfiles;
@@ -100,6 +106,71 @@ public class RequestToDomain : Profile
             opt => opt.MapFrom(src => src.Phone))
             .ForMember(dest => dest.Phone2,
             opt => opt.MapFrom(src => src.Phone2));
+        #endregion
+
+        #region Inventory
+        CreateMap<CreateInventoryRequestDto, Inventory>()
+            .ForMember(dest => dest.UserStoreId,
+            opt => opt.MapFrom(src => src.UserStoreId))
+            .ForMember(dest => dest.Name,
+            opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.ProductName,
+            opt => opt.MapFrom(src => src.ProductName))
+            .ForMember(dest => dest.Quantity,
+            opt => opt.MapFrom(src => src.Quantity));
+        // Inventory Update
+        CreateMap<UpdateInventoryRequestDto, Inventory>()
+            .ForMember(dest => dest.Name,
+            opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.ProductName,
+            opt => opt.MapFrom(src => src.ProductName))
+            .ForMember(dest => dest.Quantity,
+            opt => opt.MapFrom(src => src.Quantity));
+        #endregion
+
+        #region Mission
+        CreateMap<CreateMissionRequestDto, Mission>()
+            .ForMember(dest => dest.UserStoreId,
+            opt => opt.MapFrom(src => src.UserStoreId))
+            .ForMember(dest => dest.Name,
+            opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.IsTrashed,
+            opt => opt.MapFrom(src => src.IsTrashed))
+            .ForMember(dest => dest.TakeItBy,
+            opt => opt.MapFrom(src => src.TakeItBy))
+            .ForMember(dest => dest.AmountRequested,
+            opt => opt.MapFrom(src => src.AmountRequested))
+            .ForMember(dest => dest.IsCompleted,
+            opt => opt.MapFrom(src => src.IsCompleted));
+        #endregion
+
+        #region MoneyTransaction
+        CreateMap<DeliveryMoneyTrasnactionDto, MoneyTransaction>()
+            .ForMember(dest => dest.DeliveryUserId,
+            opt => opt.MapFrom(src => src.DeliveryUserId))
+            .ForMember(dest => dest.Amount,
+            opt => opt.MapFrom(src => src.Amount));
+
+        #endregion
+
+        #region Street
+        CreateMap<CreateStreetRequestDto, Street>()
+            .ForMember(dest => dest.Name,
+            opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.CityId,
+            opt => opt.MapFrom(src => src.CityId))
+            .ForMember(dest => dest.DeliveryPrice,
+            opt => opt.MapFrom(src => src.DeliveryPrice))
+            .ForMember(dest => dest.BlinkProfit,
+            opt => opt.MapFrom(src => src.BlinkProfit));
+        #endregion
+
+        #region Trash
+        CreateMap<CreateTrashRequestDto, Trash>()
+            .ForMember(dest => dest.Name,
+            opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.OrderId,
+            opt => opt.MapFrom(src => src.OrderId));
         #endregion
     }
 }

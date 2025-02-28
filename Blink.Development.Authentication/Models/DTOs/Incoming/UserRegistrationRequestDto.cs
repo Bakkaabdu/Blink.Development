@@ -9,6 +9,7 @@ public class UserRegistrationRequestDto
     public required string Email { get; set; }
     public required string PhoneNumber { get; set; }
     public required string Password { get; set; }
+    public decimal Balance { get; set; }
 
     [Required]
     public required UserType UserType { get; set; } // Enum to differentiate user types

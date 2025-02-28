@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Blink.Development.Entities.Dtos.Request.Order;
-using Blink.Development.Entities.Dtos.Response;
+using Blink.Development.Entities.Dtos.Response.Order;
 using Blink.Development.Entities.Entities;
 using Blink.Development.Repository.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
