@@ -16,7 +16,10 @@ namespace Blink.Development.Api
     {
         public static void Main(string[] args)
         {
+
             var builder = WebApplication.CreateBuilder(args);
+
+            //builder.WebHost.UseUrls("http://*:80");
 
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -100,6 +103,15 @@ namespace Blink.Development.Api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+            });
+
+            app.UseSwaggerUI();
+
 
             app.UseHttpsRedirection();
 

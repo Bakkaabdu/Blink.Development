@@ -1,0 +1,6 @@
+services:
+  blink.development.api:
+    image: ${DOCKER_REGISTRY-}blinkdevelopmentapi
+    build:
+      context: .
+      dockerfile: Blink.Development.Api/Dockerfile

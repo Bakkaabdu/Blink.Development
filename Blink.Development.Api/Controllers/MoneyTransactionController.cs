@@ -49,6 +49,14 @@ namespace Blink.Development.Api.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> GetTransactions()
+        {
+            var moneyTransactions = await _unitOfWork.MoneyTransactions.GetAll();
+            return Ok(moneyTransactions);
+        }
+
+
 
     }
 }
