@@ -100,47 +100,52 @@ public class MoneyTransactionRepository : GenericRepository<MoneyTransaction>, I
         }
     }
 
-    // transaction from the store to the moneytransaction entity
+    public async Task HandelStoreTransaction(MoneyTransaction transaction)
+    {
+        if (transaction == null)
+            throw new ArgumentNullException(nameof(transaction));
 
-    //public async Task HandelStoreTransaction(MoneyTransaction transaction)
-    //{
-    //    if (transaction == null)
-    //        throw new ArgumentNullException(nameof(transaction));
+        if (string.IsNullOrEmpty(transaction.UserStoreId))
+            throw new ArgumentException("Store user ID is required.", nameof(transaction.UserStoreId));
 
-    //    if (string.IsNullOrEmpty(transaction.UserStoreId))
-    //        throw new ArgumentException("Store user ID is required.", nameof(transaction.UserStoreId));
+        var storeUser = await _userManager.FindByIdAsync(transaction.UserStoreId);
 
-    //    var storeUser = await _userManager.FindByIdAsync(transaction.UserStoreId);
+        if (storeUser == null)
+            throw new InvalidOperationException("Store user not found.");
 
-    //    if (storeUser == null)
-    //        throw new InvalidOperationException("Store user not found.");
+        if (storeUser.TypeOfUser != UserType.Store)
+            throw new InvalidOperationException("Specified user is not a Store user.");
 
-    //    if (storeUser.TypeOfUser != UserType.Store)
-    //        throw new InvalidOperationException("Specified user is not a Store.");
+        if (storeUser.Balance < transaction.Amount) // Ensure sufficient balance
+            throw new InvalidOperationException("Insufficient balance for the transaction.");
 
-    //    if (transaction.Id == Guid.Empty)
-    //        transaction.Id = Guid.NewGuid();
+        if (transaction.Id == Guid.Empty)
+            transaction.Id = Guid.NewGuid();
 
-    //    using var dbTransaction = await _context.Database.BeginTransactionAsync();
-    //    try
-    //    {
-    //        // Update the store's balance
-    //        storeUser.StoreBalance += transaction.Amount;
-    //        storeUser.StoreMoneyTransactionId = transaction.Id;
-    //        transaction.TransactionDate = DateTime.UtcNow;
+        using var dbTransaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            // Deduct the transaction amount from the delivery user's balance
+            storeUser.Balance += transaction.Amount; // ✅ Correct logic
 
-    //        await _userManager.UpdateAsync(storeUser);
-    //        await _context.MoneyTransactions.AddAsync(transaction);
-    //        await _context.SaveChangesAsync();
+            // Link the transaction to the delivery user
+            storeUser.StoreMoneyTransactionId = transaction.Id;
+            transaction.TransactionDate = DateTime.UtcNow;
 
-    //        await dbTransaction.CommitAsync();
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        await dbTransaction.RollbackAsync();
-    //        throw new InvalidOperationException("Transaction failed.", ex);
-    //    }
-    //}
+            // If transferring to a store, link the store user here
+            // transaction.UserStoreId = "store_user_id_here";
+
+            await _userManager.UpdateAsync(storeUser);
+            await _context.MoneyTransactions.AddAsync(transaction);
+            await _context.SaveChangesAsync();
+            await dbTransaction.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            await dbTransaction.RollbackAsync();
+            throw; // Add logging here
+        }
+    }
 
 
 }

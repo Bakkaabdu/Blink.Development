@@ -10,7 +10,7 @@ namespace Blink.Development.Api.Controllers
     {
         public MoneyTransactionController(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper) { }
 
-        [HttpPost]
+        [HttpPost("deliveryTransaction")]
         public async Task<IActionResult> DeliveryTransaction([FromBody] DeliveryMoneyTrasnactionDto transactionDto)
         {
             if (transactionDto == null)
@@ -28,6 +28,26 @@ namespace Blink.Development.Api.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+        [HttpPost("StoreTransaction")]
+        public async Task<IActionResult> StoreTransaction([FromBody] StoreMoneyTrasnactionDto transactionDto)
+        {
+            if (transactionDto == null)
+                return BadRequest("Invalid transaction data.");
+
+            var transaction = _mapper.Map<MoneyTransaction>(transactionDto); // Map DTO to Entity
+
+            try
+            {
+                await _unitOfWork.MoneyTransactions.HandelStoreTransaction(transaction);
+                return Ok(new { message = "Transaction processed successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
 
 
     }

@@ -151,6 +151,12 @@ public class RequestToDomain : Profile
             .ForMember(dest => dest.Amount,
             opt => opt.MapFrom(src => src.Amount));
 
+        CreateMap<StoreMoneyTrasnactionDto, MoneyTransaction>()
+            .ForMember(dest => dest.UserStoreId,
+            opt => opt.MapFrom(src => src.UserStoreId))
+            .ForMember(dest => dest.Amount,
+            opt => opt.MapFrom(src => src.Amount));
+
         #endregion
 
         #region Street
