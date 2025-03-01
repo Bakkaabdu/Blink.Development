@@ -3,13 +3,11 @@ using Blink.Development.Entities.Dtos.Request.Branch;
 using Blink.Development.Entities.Dtos.Response.Branch;
 using Blink.Development.Entities.Entities;
 using Blink.Development.Repository.Repositories.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blink.Development.Api.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
     public class BranchController : CommonController
     {
 
@@ -45,10 +43,17 @@ namespace Blink.Development.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetBranchs()
+        public async Task<IActionResult> GetBranchs(int page = 1, int pageSize = 10)
         {
             var branchs = await _unitOfWork.Branchs.GetAll();
-            return Ok(branchs);
+            var totalCount = branchs.Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
+            var perPage = branchs
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return Ok(perPage);
         }
 
         [HttpPatch("")]

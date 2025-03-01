@@ -43,10 +43,17 @@ namespace Blink.Development.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCustomers()
+        public async Task<IActionResult> GetCustomers(int page = 1, int pageSize = 10)
         {
             var customers = await _unitOfWork.Customers.GetAll();
-            return Ok(customers);
+            var totalCount = customers.Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
+            var perPage = customers
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return Ok(perPage);
         }
 
         [HttpPatch("")]

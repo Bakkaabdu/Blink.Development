@@ -9,8 +9,6 @@ public class AppDbContext : IdentityDbContext<User>
 {
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-    // store delivery(check the last one) city order branch Trash and cutomers are done
-    // DbSet properties using proper PascalCase naming
     public DbSet<Order> Orders { get; set; }
     public DbSet<City> Cities { get; set; }
     public DbSet<Street> Streets { get; set; }

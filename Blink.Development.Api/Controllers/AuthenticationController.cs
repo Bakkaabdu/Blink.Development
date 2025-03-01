@@ -106,10 +106,17 @@ namespace Blink.Development.Api.Controllers
         }
 
         [HttpGet("getAllUsers")]
-        public IActionResult GetAllUsers()
+        public IActionResult GetAllUsers(int page = 1, int pageSize = 10)
         {
             var users = _userManager.Users.ToList();
-            return Ok(users);
+            var totalCount = users.Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
+            var perPage = users
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return Ok(perPage);
         }
 
         [HttpPost("login")]

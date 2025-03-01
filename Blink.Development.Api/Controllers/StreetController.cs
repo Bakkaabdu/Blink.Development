@@ -41,10 +41,17 @@ namespace Blink.Development.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetStreets()
+        public async Task<IActionResult> GetStreets(int page = 1, int pageSize = 10)
         {
             var streets = await _unitOfWork.Streets.GetAll();
-            return Ok(streets);
+            var totalCount = streets.Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
+            var perPage = streets
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return Ok(perPage);
         }
 
         [HttpDelete]

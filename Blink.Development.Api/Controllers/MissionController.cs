@@ -41,10 +41,17 @@ namespace Blink.Development.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMissions()
+        public async Task<IActionResult> GetMissions(int page = 1, int pageSize = 10)
         {
             var missions = await _unitOfWork.Missions.GetAll();
-            return Ok(missions);
+            var totalCount = missions.Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
+            var perPage = missions
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return Ok(perPage);
         }
 
         [HttpDelete]

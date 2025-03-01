@@ -50,10 +50,17 @@ namespace Blink.Development.Api.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetTransactions()
+        public async Task<IActionResult> GetTransactions(int page = 1, int pageSize = 10)
         {
             var moneyTransactions = await _unitOfWork.MoneyTransactions.GetAll();
-            return Ok(moneyTransactions);
+            var totalCount = moneyTransactions.Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
+            var perPage = moneyTransactions
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return Ok(perPage);
         }
 
 

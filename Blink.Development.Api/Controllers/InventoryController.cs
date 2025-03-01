@@ -41,10 +41,17 @@ namespace Blink.Development.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetInventories()
+        public async Task<IActionResult> GetInventories(int page = 1, int pageSize = 10)
         {
             var inventories = await _unitOfWork.Inventories.GetAll();
-            return Ok(inventories);
+            var totalCount = inventories.Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
+            var perPage = inventories
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return Ok(perPage);
         }
 
         [HttpPatch("")]

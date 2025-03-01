@@ -42,9 +42,17 @@ namespace Blink.Development.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTrashs()
+        public async Task<IActionResult> GetTrashs(int page = 1, int pageSize = 10)
         {
             var trashes = await _unitOfWork.Trashes.GetAll();
+            var totalCount = trashes.Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
+            var perPage = trashes
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return Ok(perPage);
             return Ok(trashes);
         }
 
